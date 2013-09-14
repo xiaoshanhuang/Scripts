@@ -86,11 +86,13 @@ def checkConnection(url, waitCode, connectTimeOut):
 # Search IP via wmi in Windows
 def freeIPSearchWmi(ipPreFix, ipSweepRange):
 	import wmi
+	import time
 	wmiService = wmi.WMI()
 	colNicConfigs = wmiService.Win32_NetworkAdapterConfiguration(IPEnabled = True)
 	if len(colNicConfigs) < 1:
 		print "Can't find Netowrk Adapter"
 	objNicConfig = colNicConfigs[0]
+	currentIPAddress = objNicConfig.IPAddress
 	for ipSweep in ipSweepRange:
 		arrIPAddresses = [ipPreFix + str(ipSweep)]
 		intReboot = 0
@@ -103,11 +105,15 @@ def freeIPSearchWmi(ipPreFix, ipSweepRange):
 				return True
 		else:
 			print "Can't change IP address..."
+	objNicConfig.EnableStatic(IPAddress = currentIPAddress, SubnetMask = arrSubnetMasks)
+	time.sleep(10)
+	pyEmail(currentIPAddress, 'Failed')
 	return False
 
 # Search IP via networksetup in Mac OS X
 def freeIPSearchOSX(ipPreFix, ipSweepRange):
 	import commands
+	import time
 	currentIPAddress = getIPAddressOSX()
 	networkService = 'Wi-Fi'
 	for ipSweep in ipSweepRange:
@@ -119,6 +125,7 @@ def freeIPSearchOSX(ipPreFix, ipSweepRange):
 			pyEmail(arrIPAddresses, 'Connected')
 			return True
 	commands.getoutput('networksetup -setmanualwithdhcprouter ' + networkService + ' ' + currentIPAddress)
+	time.sleep(10)
 	pyEmail(currentIPAddress, 'Failed')
 	return False
 
