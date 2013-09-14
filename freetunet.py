@@ -48,7 +48,7 @@ def pyEmail(subject, body):
 	session.quit()
 
 # check connection by grab redirected html info
-def checkConnection(url, connectTimeOut):
+def checkConnection(url, waitCode, connectTimeOut):
 	import urllib2, httplib
 	import time
 	httplib.HTTPConnection.debuglevel = 1
@@ -62,7 +62,7 @@ def checkConnection(url, connectTimeOut):
 		try:
 			f = opener.open(request)
 		except urllib2.URLError, e:
-			if e.reason[0] == 11001:
+			if e.reason[0] == waitCode:
 				# Wait for network connection
 				reConnect = True
 				connectCount += 1
@@ -97,7 +97,7 @@ def freeIPSearchWmi(ipPreFix, ipSweepRange):
 		returnValue = objNicConfig.EnableStatic(IPAddress = arrIPAddresses, SubnetMask = arrSubnetMasks)
 		if returnValue[0] == 0:
 			print "Current IP:"+arrIPAddresses
-			if checkConnection(baidu, connectTimeOut):
+			if checkConnection(baidu, 11001, connectTimeOut):
 				print 'WOW'
 				pyEmail(arrIPAddresses, 'Connected')
 				return True
@@ -111,10 +111,10 @@ def freeIPSearchOSX(ipPreFix, ipSweepRange):
 	currentIPAddress = getIPAddressOSX()
 	networkService = 'Wi-Fi'
 	for ipSweep in ipSweepRange:
-		arrIPAddresses = [ipPreFix + str(ipSweep)]
+		arrIPAddresses = ipPreFix + str(ipSweep)
 		commands.getoutput('networksetup -setmanualwithdhcprouter ' + networkService + ' ' + arrIPAddresses)
 		print 'Current IP:' + arrIPAddresses
-		if checkConnection(baidu, connectTimeOut):
+		if checkConnection(baidu, 8, connectTimeOut):
 			print 'WOW'
 			pyEmail(arrIPAddresses, 'Connected')
 			return True
