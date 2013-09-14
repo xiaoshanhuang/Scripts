@@ -3,92 +3,137 @@
 #title           : freetunet.py
 #description     : config ip for free tunet access
 #author          : Xiaoshan Huang, xiaoshanhuang@gmail.com
-#date            : 2013-09-13 23:11
-#version         : 0.2
+#date            : 2013-09-14 23:24
+#version         : 0.3
 #usage           : python freetunet.py
 #notes           : 
 #python_version  : 2.7
 #==============================================================================
-
-
-# # Get IP address for Mac OS X
-# import platform
-# import subprocess
-# commands = {
-# 	'Darwin': {'ipv4': "ifconfig  | grep -E 'inet.[0-9]' | grep -v '127.0.0.1' | awk '{ print $2}'", 'ipv6': "ifconfig  | grep -E 'inet6.[0-9]' | grep -v 'fe80:' | awk '{ print $2}'"},
-# 	'Linux': {'ipv4': "/sbin/ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'", 'ipv6': "/sbin/ifconfig  | grep 'inet6 addr:'| grep 'Global' | grep -v 'fe80' | awk '{print $3}'"}
-# }
-
-# def ip_addresses(version):
-# 	proc = subprocess.Popen(commands[platform.system()][version], shell=True,stdout=subprocess.PIPE)
-# 	return proc.communicate()[0].replace('\n', '')
-
-# print ip_addresses('ipv4')
-
-import os
-import urllib2, httplib
-import time
-url = "http://net.tsinghua.edu.cn/"
+ipPreFix = '166.111.153.'	# IP prefix for school of medicine
+ipSweepRange = range(1,255)
+arrSubnetMasks = ['255.255.254.0']
+connectTimeOut = 5
+tunet = "http://net.tsinghua.edu.cn/"
 baidu = "http://www.baidu.com/"
 
-def openConnection(request, opener):
-	try:
-		f = opener.open(request)
-	except urllib2.URLError, e:
-		if e.reason[0] == 11001:
-			return 1
-		else:
-			return 0
+# Get IPv4 address for Mac OS X
+def getIPAddressOSX():
+	import commands
+	cmd = "networksetup -getinfo Wi-Fi | grep -Eo 'IP address: [0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | awk '{ print $3}'"
+	ip = commands.getoutput(cmd)
+	return ip
 
-def checkBaidu():
+# Email notification
+def pyEmail(subject, body):
+	import smtplib
+	SMTP_SERVER = 'smtp.gmail.com'
+	SMTP_PORT = 587
+	sender = 'hxspyemail@gmail.com'
+	password = 'pythonemail'
+	recipient = 'xiaoshanhuang@gmail.com'
+
+	body = "" + body + ""
+	headers = ["From: " + sender,
+	           "Subject: " + subject,
+	           "To: " + recipient,
+	           "MIME-Version: 1.0",
+	           "Content-Type: text/html"]
+	headers = "\r\n".join(headers)
+	session = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+	session.ehlo()
+	session.starttls()
+	session.ehlo
+	session.login(sender, password)
+	session.sendmail(sender, recipient, headers + "\r\n\r\n" + body)
+	session.quit()
+
+# check connection by grab redirected html info
+def checkConnection(url, connectTimeOut):
+	import urllib2, httplib
+	import time
 	httplib.HTTPConnection.debuglevel = 1
-	request = urllib2.Request(baidu)
+	request = urllib2.Request(url)
 	request.add_header("Accept", "text/html,*/*")
 	request.add_header("Connection", "Keep-Alive")
 	opener = urllib2.build_opener()
-	timeOut = 5
-	count = 0
-	while openConnection(request, opener) and (count<timeOut):
-		count += 1
-		time.sleep(2)
-	if count < timeOut:
+	reConnect = True
+	connectCount = 0;
+	while reConnect and connectCount<connectTimeOut:
+		try:
+			f = opener.open(request)
+		except urllib2.URLError, e:
+			if e.reason[0] == 11001:
+				# Wait for network connection
+				reConnect = True
+				connectCount += 1
+				time.sleep(2)
+			else:
+				print e.reason
+				reConnect = False
+				return False
+	if connectCount >= connectTimeOut:
+		print 'Connection timeout'
+		return False
+	else:
 		f = opener.open(request)
-		if f.url == baidu:
-			print 'Connected'
+		if f.url == url:
+			print 'TUNet Connected'
 			return True
 		else:
+			print 'TUNet disconnected'
 			return False
-	else:
-		return False
 
+# Search IP via wmi in Windows
+def freeIPSearchWmi(ipPreFix, ipSweepRange):
+	import wmi
+	wmiService = wmi.WMI()
+	colNicConfigs = wmiService.Win32_NetworkAdapterConfiguration(IPEnabled = True)
+	if len(colNicConfigs) < 1:
+		print "Can't find Netowrk Adapter"
+	objNicConfig = colNicConfigs[0]
+	for ipSweep in ipSweepRange:
+		arrIPAddresses = [ipPreFix + str(ipSweep)]
+		intReboot = 0
+		returnValue = objNicConfig.EnableStatic(IPAddress = arrIPAddresses, SubnetMask = arrSubnetMasks)
+		if returnValue[0] == 0:
+			print "Current IP:"+arrIPAddresses
+			if checkConnection(baidu, connectTimeOut):
+				print 'WOW'
+				pyEmail(arrIPAddresses, 'Connected')
+				return True
+		else:
+			print "Can't change IP address..."
+	return False
 
-import wmi
-
-wmiService = wmi.WMI()
-colNicConfigs = wmiService.Win32_NetworkAdapterConfiguration(IPEnabled = True)
-if len(colNicConfigs) < 1:
-    exit()
-objNicConfig = colNicConfigs[0]
-
-ipFix = '166.111.153.'
-arrSubnetMasks = ['255.255.254.0']
-for ipSweep in range(1, 232):
-	arrIPAddresses = [ipFix + str(ipSweep)]
-	intReboot = 0
-	returnValue = objNicConfig.EnableStatic(IPAddress = arrIPAddresses, SubnetMask = arrSubnetMasks)
-	if returnValue[0] == 0:
-		print "Current IP:"
-		print arrIPAddresses
-		# os.system('pause')
-		if checkBaidu():
+# Search IP via networksetup in Mac OS X
+def freeIPSearchOSX(ipPreFix, ipSweepRange):
+	import commands
+	currentIPAddress = getIPAddressOSX()
+	networkService = 'Wi-Fi'
+	for ipSweep in ipSweepRange:
+		arrIPAddresses = [ipPreFix + str(ipSweep)]
+		commands.getoutput('networksetup -setmanualwithdhcprouter ' + networkService + ' ' + arrIPAddresses)
+		print 'Current IP:' + arrIPAddresses
+		if checkConnection(baidu, connectTimeOut):
 			print 'WOW'
-			# os.system('pause')
-			exit()
-	elif returnValue[0] == 1:
-	    print "Reboot"
-	    intReboot += 1
+			pyEmail(arrIPAddresses, 'Connected')
+			return True
+	commands.getoutput('networksetup -setmanualwithdhcprouter ' + networkService + ' ' + currentIPAddress)
+	pyEmail(currentIPAddress, 'Failed')
+	return False
+
+if __name__=="__main__":
+	import platform
+	system = platform.system()
+	if system == 'Darwin':
+		freeIPSearchOSX(ipPreFix, ipSweepRange)
+	elif system == 'Windows':
+		freeIPSearchWmi(ipPreFix, ipSweepRange)
 	else:
-	    print "Error"
+		print 'Linux?'
+
+
+
 
 # from selenium import webdriver
 # import time
