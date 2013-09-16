@@ -4,13 +4,13 @@
 #description     : config ip for free tunet access
 #author          : Xiaoshan Huang, xiaoshanhuang@gmail.com
 #date            : 2013-09-14 23:24
-#version         : 0.4
+#version         : 0.5
 #usage           : python freetunet.py
 #notes           : 
 #python_version  : 2.7
 #==============================================================================
 ipPreFix = '166.111.153.'	# IP prefix for school of medicine
-ipSweepRange = range(1,255)
+ipSweepRange = range(100,255)
 arrSubnetMasks = '255.255.254.0'
 arrRouterAddr = '166.111.152.1'
 connectTimeOut = 5
@@ -61,8 +61,8 @@ def checkConnection(url, waitCode, connectTimeOut):
 	connectCount = 0;
 	while reConnect and connectCount<connectTimeOut:
 		try:
-			f = opener.open(request, None, 10)
-		except urllib2.URLError, e:
+			f = opener.open(request)
+		except Exception, e:
 			if hasattr(e, 'reason'):
 				if e.reason[0] == waitCode:
 					# Wait for network connection
@@ -75,7 +75,10 @@ def checkConnection(url, waitCode, connectTimeOut):
 					return False
 			else:
 				print e
+				reConnect = False
 				return False
+		else:
+			reConnect = False
 	if connectCount >= connectTimeOut:
 		print 'Connection timeout'
 		return False
@@ -99,11 +102,13 @@ def freeIPSearchWmi(ipPreFix, ipSweepRange):
 	objNicConfig = colNicConfigs[0]
 	currentIPAddress = objNicConfig.IPAddress
 	for ipSweep in ipSweepRange:
-		arrIPAddresses = [ipPreFix + str(ipSweep)]
+		arrIPAddresses = ipPreFix + str(ipSweep)
 		intReboot = 0
-		returnValue = objNicConfig.EnableStatic(IPAddress = arrIPAddresses, SubnetMask = [arrSubnetMasks])
+		subnetMasks = [arrSubnetMasks]
+		ipAddress = [arrIPAddresses]
+		returnValue = objNicConfig.EnableStatic(IPAddress = ipAddress, SubnetMask = subnetMasks)
 		if returnValue[0] == 0:
-			print "Current IP:"+arrIPAddresses
+			print "Current IP:" + ipPreFix + str(ipSweep)
 			if checkConnection(baidu, 11001, connectTimeOut):
 				print 'WOW'
 				pyEmail(arrIPAddresses, 'Connected')
@@ -136,13 +141,19 @@ def freeIPSearchOSX(ipPreFix, ipSweepRange):
 
 if __name__=="__main__":
 	import platform
-	system = platform.system()
-	if system == 'Darwin':
-		freeIPSearchOSX(ipPreFix, ipSweepRange)
-	elif system == 'Windows':
-		freeIPSearchWmi(ipPreFix, ipSweepRange)
-	else:
-		print 'Linux?'
+	import os
+	try:
+		system = platform.system()
+		if system == 'Darwin':
+			freeIPSearchOSX(ipPreFix, ipSweepRange)
+		elif system == 'Windows':
+			freeIPSearchWmi(ipPreFix, ipSweepRange)
+		else:
+			print 'Linux?'
+	except Exception, e:
+		print e
+		os.system('pause')
+
 
 
 
