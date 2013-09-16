@@ -4,14 +4,15 @@
 #description     : config ip for free tunet access
 #author          : Xiaoshan Huang, xiaoshanhuang@gmail.com
 #date            : 2013-09-14 23:24
-#version         : 0.3
+#version         : 0.4
 #usage           : python freetunet.py
 #notes           : 
 #python_version  : 2.7
 #==============================================================================
 ipPreFix = '166.111.153.'	# IP prefix for school of medicine
 ipSweepRange = range(1,255)
-arrSubnetMasks = ['255.255.254.0']
+arrSubnetMasks = '255.255.254.0'
+arrRouterAddr = '166.111.152.1'
 connectTimeOut = 5
 tunet = "http://net.tsinghua.edu.cn/"
 baidu = "http://www.baidu.com/"
@@ -60,16 +61,20 @@ def checkConnection(url, waitCode, connectTimeOut):
 	connectCount = 0;
 	while reConnect and connectCount<connectTimeOut:
 		try:
-			f = opener.open(request)
+			f = opener.open(request, None, 10)
 		except urllib2.URLError, e:
-			if e.reason[0] == waitCode:
-				# Wait for network connection
-				reConnect = True
-				connectCount += 1
-				time.sleep(2)
+			if hasattr(e, 'reason'):
+				if e.reason[0] == waitCode:
+					# Wait for network connection
+					reConnect = True
+					connectCount += 1
+					time.sleep(2)
+				else:
+					print e.reason
+					reConnect = False
+					return False
 			else:
-				print e.reason
-				reConnect = False
+				print e
 				return False
 	if connectCount >= connectTimeOut:
 		print 'Connection timeout'
@@ -96,7 +101,7 @@ def freeIPSearchWmi(ipPreFix, ipSweepRange):
 	for ipSweep in ipSweepRange:
 		arrIPAddresses = [ipPreFix + str(ipSweep)]
 		intReboot = 0
-		returnValue = objNicConfig.EnableStatic(IPAddress = arrIPAddresses, SubnetMask = arrSubnetMasks)
+		returnValue = objNicConfig.EnableStatic(IPAddress = arrIPAddresses, SubnetMask = [arrSubnetMasks])
 		if returnValue[0] == 0:
 			print "Current IP:"+arrIPAddresses
 			if checkConnection(baidu, 11001, connectTimeOut):
@@ -118,7 +123,7 @@ def freeIPSearchOSX(ipPreFix, ipSweepRange):
 	networkService = 'Wi-Fi'
 	for ipSweep in ipSweepRange:
 		arrIPAddresses = ipPreFix + str(ipSweep)
-		commands.getoutput('networksetup -setmanualwithdhcprouter ' + networkService + ' ' + arrIPAddresses)
+		commands.getoutput('networksetup -setmanual ' + networkService + ' ' + arrIPAddresses + ' ' + arrSubnetMasks + ' ' + arrRouterAddr)
 		print 'Current IP:' + arrIPAddresses
 		if checkConnection(baidu, 8, connectTimeOut):
 			print 'WOW'
