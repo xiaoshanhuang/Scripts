@@ -10,7 +10,7 @@
 #python_version  : 2.7
 #==============================================================================
 ipPreFix = '166.111.153.'	# IP prefix for school of medicine
-ipSweepRange = range(100,255)
+ipSweepRange = range(6,8)
 arrSubnetMasks = '255.255.254.0'
 arrRouterAddr = '166.111.152.1'
 connectTimeOut = 5
@@ -128,7 +128,8 @@ def freeIPSearchOSX(ipPreFix, ipSweepRange):
 	networkService = 'Wi-Fi'
 	for ipSweep in ipSweepRange:
 		arrIPAddresses = ipPreFix + str(ipSweep)
-		commands.getoutput('networksetup -setmanual ' + networkService + ' ' + arrIPAddresses + ' ' + arrSubnetMasks + ' ' + arrRouterAddr)
+		# commands.getoutput('networksetup -setmanual ' + networkService + ' ' + arrIPAddresses + ' ' + arrSubnetMasks + ' ' + arrRouterAddr)
+		commands.getoutput('networksetup -setmanualwithdhcprouter ' + networkService + ' ' + arrIPAddresses)
 		print 'Current IP:' + arrIPAddresses
 		if checkConnection(baidu, 8, connectTimeOut):
 			print 'WOW'
