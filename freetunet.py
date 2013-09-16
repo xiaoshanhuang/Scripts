@@ -10,7 +10,7 @@
 #python_version  : 2.7
 #==============================================================================
 ipPreFix = '166.111.153.'	# IP prefix for school of medicine
-ipSweepRange = range(1,255)
+ipSweepRange = range(100,255)
 arrSubnetMasks = '255.255.254.0'
 arrRouterAddr = '166.111.152.1'
 connectTimeOut = 5
@@ -27,9 +27,9 @@ def getIPAddressOSX():
 # Email notification
 def pyEmail(subject, body):
 	import smtplib
-	SMTP_SERVER = 'smtp.gmail.com'
-	SMTP_PORT = 587
-	sender = 'hxspyemail@gmail.com'
+	SMTP_SERVER = 'smtp.163.com'
+	SMTP_PORT = 25
+	sender = 'hxspyemail@163.com'
 	password = 'pythonemail'
 	recipient = 'xiaoshanhuang@gmail.com'
 
