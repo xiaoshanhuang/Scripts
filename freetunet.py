@@ -155,18 +155,3 @@ if __name__=="__main__":
 	except Exception, e:
 		print e
 		os.system('pause')
-
-
-
-
-
-# from selenium import webdriver
-# import time
-# browser = webdriver.Firefox() # Get local session of firefox
-# browser.get(url) # Load page
-# time.sleep(0.5)
-# if browser.find_elements_by_class_name("disconnect"):
-# 	print "WOW"
-# else:
-# 	print "..."
-# browser.close()
