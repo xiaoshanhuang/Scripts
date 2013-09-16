@@ -10,7 +10,6 @@
 #python_version  : 2.7
 #==============================================================================
 ipPreFix = '166.111.153.'	# IP prefix for school of medicine
-ipSweepRange = range(100,255)
 arrSubnetMasks = '255.255.254.0'
 arrRouterAddr = '166.111.152.1'
 connectTimeOut = 5
@@ -23,6 +22,19 @@ def getIPAddressOSX():
 	cmd = "networksetup -getinfo Wi-Fi | grep -Eo 'IP address: [0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | awk '{ print $3}'"
 	ip = commands.getoutput(cmd)
 	return ip
+
+# Use arp -a to determine ipSweepRange
+def getIPSweepRange(ipPreFix):
+	import commands
+	import re
+	cmd = "arp -a | grep -E '" + ipPreFix + "' | awk '{ print $2}'"
+	occupiedIPs = commands.getoutput(cmd)
+	lastIP = re.findall(ipPreFix + "(.*)\)", occupiedIPs)
+	avaliableIPs = []
+	for i in range(1,255):
+		if str(i) not in lastIP:
+			avaliableIPs.append(i)
+	return avaliableIPs
 
 # Email notification
 def pyEmail(subject, body):
@@ -144,6 +156,8 @@ def freeIPSearchOSX(ipPreFix, ipSweepRange):
 if __name__=="__main__":
 	import platform
 	import os
+	# ipSweepRange = range(100,255)
+	ipSweepRange = getIPSweepRange(ipPreFix)
 	try:
 		system = platform.system()
 		if system == 'Darwin':
