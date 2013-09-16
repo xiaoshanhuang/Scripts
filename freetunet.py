@@ -10,7 +10,7 @@
 #python_version  : 2.7
 #==============================================================================
 ipPreFix = '166.111.153.'	# IP prefix for school of medicine
-ipSweepRange = range(6,8)
+ipSweepRange = range(1,255)
 arrSubnetMasks = '255.255.254.0'
 arrRouterAddr = '166.111.152.1'
 connectTimeOut = 5
@@ -112,7 +112,7 @@ def freeIPSearchWmi(ipPreFix, ipSweepRange):
 			print "Current IP:" + ipPreFix + str(ipSweep)
 			if checkConnection(baidu, 11001, connectTimeOut):
 				print 'WOW'
-				pyEmail(arrIPAddresses, os.environ['COMPUTERNAME'] + ' Connected')
+				pyEmail(arrIPAddresses, 'Windows Connected')
 				return True
 		else:
 			print "Can't change IP address..."
@@ -134,7 +134,7 @@ def freeIPSearchOSX(ipPreFix, ipSweepRange):
 		print 'Current IP:' + arrIPAddresses
 		if checkConnection(baidu, 8, connectTimeOut):
 			print 'WOW'
-			pyEmail(arrIPAddresses, os.environ['COMPUTERNAME'] + ' Connected')
+			pyEmail(arrIPAddresses, 'Mac Connected')
 			return True
 	commands.getoutput('networksetup -setmanualwithdhcprouter ' + networkService + ' ' + currentIPAddress)
 	time.sleep(10)
