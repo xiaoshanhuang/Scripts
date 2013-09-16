@@ -95,6 +95,7 @@ def checkConnection(url, waitCode, connectTimeOut):
 def freeIPSearchWmi(ipPreFix, ipSweepRange):
 	import wmi
 	import time
+	import os
 	wmiService = wmi.WMI()
 	colNicConfigs = wmiService.Win32_NetworkAdapterConfiguration(IPEnabled = True)
 	if len(colNicConfigs) < 1:
@@ -111,7 +112,7 @@ def freeIPSearchWmi(ipPreFix, ipSweepRange):
 			print "Current IP:" + ipPreFix + str(ipSweep)
 			if checkConnection(baidu, 11001, connectTimeOut):
 				print 'WOW'
-				pyEmail(arrIPAddresses, 'Connected')
+				pyEmail(arrIPAddresses, os.environ['COMPUTERNAME'] + ' Connected')
 				return True
 		else:
 			print "Can't change IP address..."
@@ -133,7 +134,7 @@ def freeIPSearchOSX(ipPreFix, ipSweepRange):
 		print 'Current IP:' + arrIPAddresses
 		if checkConnection(baidu, 8, connectTimeOut):
 			print 'WOW'
-			pyEmail(arrIPAddresses, 'Connected')
+			pyEmail(arrIPAddresses, os.environ['COMPUTERNAME'] + ' Connected')
 			return True
 	commands.getoutput('networksetup -setmanualwithdhcprouter ' + networkService + ' ' + currentIPAddress)
 	time.sleep(10)
