@@ -3,8 +3,8 @@
 #title           : freetunet.py
 #description     : config ip for free tunet access
 #author          : Xiaoshan Huang, xiaoshanhuang@gmail.com
-#date            : 2013-09-14 23:24
-#version         : 0.5
+#date            : 2013-09-22 15:51
+#version         : 0.6
 #usage           : python freetunet.py
 #notes           : 
 #python_version  : 2.7
@@ -156,8 +156,14 @@ def freeIPSearchOSX(ipPreFix, ipSweepRange):
 if __name__=="__main__":
 	import platform
 	import os
-	# ipSweepRange = range(100,255)
-	ipSweepRange = getIPSweepRange(ipPreFix)
+	ipRange = range(50,255)
+	availableIPRange = getIPSweepRange(ipPreFix)
+	ipSweepRange = [];
+	for ip in availableIPRange:
+		if ip in ipRange:
+			ipSweepRange.append(ip)
+	print ipSweepRange
+	# ipSweepRange = ipRange
 	try:
 		system = platform.system()
 		if system == 'Darwin':
