@@ -12,7 +12,8 @@
 ipPreFix = '166.111.153.'	# IP prefix for school of medicine
 arrSubnetMasks = '255.255.254.0'
 arrRouterAddr = '166.111.152.1'
-connectTimeOut = 5
+waitTime = 1
+connectTimeOut = 3
 tunet = "http://net.tsinghua.edu.cn/"
 baidu = "http://www.baidu.com/"
 
@@ -80,7 +81,7 @@ def checkConnection(url, waitCode, connectTimeOut):
 					# Wait for network connection
 					reConnect = True
 					connectCount += 1
-					time.sleep(2)
+					time.sleep(waitTime)
 				else:
 					print e.reason
 					reConnect = False
@@ -156,8 +157,9 @@ def freeIPSearchOSX(ipPreFix, ipSweepRange):
 if __name__=="__main__":
 	import platform
 	import os
-	ipRange = range(50,255)
+	ipRange = range(75,255)
 	availableIPRange = getIPSweepRange(ipPreFix)
+	# availableIPRange = range(1,255)
 	ipSweepRange = [];
 	for ip in availableIPRange:
 		if ip in ipRange:
