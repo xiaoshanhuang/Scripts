@@ -157,7 +157,7 @@ def freeIPSearchOSX(ipPreFix, ipSweepRange):
 if __name__=="__main__":
 	import platform
 	import os
-	ipRange = range(50,255)
+	ipRange = range(100,255)
 	availableIPRange = getIPSweepRange(ipPreFix)
 	# availableIPRange = range(1,255)
 	ipSweepRange = [];
