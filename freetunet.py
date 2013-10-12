@@ -104,6 +104,28 @@ def checkConnection(url, waitCode, connectTimeOut):
 			print 'TUNet disconnected'
 			return False
 
+# Set network to DHCP via wmi in Win
+def setDHCPWin():
+	import wmi
+	import time
+	wmiService = wmi.WMI()
+	colNicConfigs = wmiService.Win32_NetworkAdapterConfiguration(IPEnabled = True)
+	if len(colNicConfigs) < 1:
+		print "Can't find Netowrk Adapter"
+	objNicConfig = colNicConfigs[0]
+	objNicConfig.ENableDHCP()
+	time.sleep(3)
+	return objNicConfig.IPAddress
+
+# Set network to DHCP via networksetup in Mac OS X
+def setDHCPOSX():
+	import commands
+	import time
+	networkService = 'Wi-Fi'
+	commands.getoutput('networksetup -setdhcp ' + networkService)
+	time.sleep(3)
+	return getIPAddressOSX()
+
 # Search IP via wmi in Windows
 def freeIPSearchWmi(ipPreFix, ipSweepRange):
 	import wmi
@@ -115,24 +137,29 @@ def freeIPSearchWmi(ipPreFix, ipSweepRange):
 		print "Can't find Netowrk Adapter"
 	objNicConfig = colNicConfigs[0]
 	currentIPAddress = objNicConfig.IPAddress
-	for ipSweep in ipSweepRange:
-		arrIPAddresses = ipPreFix + str(ipSweep)
-		intReboot = 0
-		subnetMasks = [arrSubnetMasks]
-		ipAddress = [arrIPAddresses]
-		returnValue = objNicConfig.EnableStatic(IPAddress = ipAddress, SubnetMask = subnetMasks)
-		if returnValue[0] == 0:
-			print "Current IP:" + ipPreFix + str(ipSweep)
-			if checkConnection(baidu, 11001, connectTimeOut):
-				print 'WOW'
-				pyEmail(arrIPAddresses, 'Windows Connected')
-				return True
-		else:
-			print "Can't change IP address..."
+	try: 
+		for ipSweep in ipSweepRange:
+			arrIPAddresses = ipPreFix + str(ipSweep)
+			intReboot = 0
+			subnetMasks = [arrSubnetMasks]
+			ipAddress = [arrIPAddresses]
+			returnValue = objNicConfig.EnableStatic(IPAddress = ipAddress, SubnetMask = subnetMasks)
+			if returnValue[0] == 0:
+				print "Current IP:" + ipPreFix + str(ipSweep)
+				if checkConnection(baidu, 11001, connectTimeOut):
+					print 'WOW'
+					pyEmail(arrIPAddresses, 'Windows Connected')
+					return True
+			else:
+				print "Can't change IP address..."
+	except KeyboardInterrupt:
+		print 'freeIPSearchWmi'
+		raise
 	objNicConfig.EnableStatic(IPAddress = currentIPAddress, SubnetMask = arrSubnetMasks)
 	time.sleep(10)
 	pyEmail(currentIPAddress, 'Failed')
 	return False
+
 
 # Search IP via networksetup in Mac OS X
 def freeIPSearchOSX(ipPreFix, ipSweepRange):
@@ -140,24 +167,43 @@ def freeIPSearchOSX(ipPreFix, ipSweepRange):
 	import time
 	currentIPAddress = getIPAddressOSX()
 	networkService = 'Wi-Fi'
-	for ipSweep in ipSweepRange:
-		arrIPAddresses = ipPreFix + str(ipSweep)
-		# commands.getoutput('networksetup -setmanual ' + networkService + ' ' + arrIPAddresses + ' ' + arrSubnetMasks + ' ' + arrRouterAddr)
-		commands.getoutput('networksetup -setmanualwithdhcprouter ' + networkService + ' ' + arrIPAddresses)
-		print 'Current IP:' + arrIPAddresses
-		if checkConnection(baidu, 8, connectTimeOut):
-			print 'WOW'
-			pyEmail(arrIPAddresses, 'Mac Connected')
-			return True
+	try: 
+		for ipSweep in ipSweepRange:
+			arrIPAddresses = ipPreFix + str(ipSweep)
+			# commands.getoutput('networksetup -setmanual ' + networkService + ' ' + arrIPAddresses + ' ' + arrSubnetMasks + ' ' + arrRouterAddr)
+			commands.getoutput('networksetup -setmanualwithdhcprouter ' + networkService + ' ' + arrIPAddresses)
+			print 'Current IP:' + arrIPAddresses
+			if checkConnection(baidu, 8, connectTimeOut):
+				print 'WOW'
+				pyEmail(arrIPAddresses, 'Mac Connected')
+				return True
+	except KeyboardInterrupt:
+		print 'freeIPSearchOSX'
+		raise
 	commands.getoutput('networksetup -setmanualwithdhcprouter ' + networkService + ' ' + currentIPAddress)
 	time.sleep(10)
 	pyEmail(currentIPAddress, 'Failed')
 	return False
 
+def onExit():
+	import platform
+	import time
+	print 'Exit by user.'
+	print 'Set network to DHCP with IPAddress: '
+	system = platform.system()
+	if system == 'Darwin':
+		print setDHCPOSX()
+	elif system == 'Windows':
+		print setDHCPWin()
+	else:
+		print 'Linux?'
+
 if __name__=="__main__":
 	import platform
 	import os
-	ipRange = range(30,255)
+	import commands
+	import time
+	ipRange = range(50,255)
 	# availableIPRange = getIPSweepRange(ipPreFix)
 	availableIPRange = range(1,255)
 	ipSweepRange = [];
@@ -174,8 +220,7 @@ if __name__=="__main__":
 			freeIPSearchWmi(ipPreFix, ipSweepRange)
 		else:
 			print 'Linux?'
-	except (KeyboardInterrupt, SystemExit):
-		raise
+	except KeyboardInterrupt:
+		onExit()
 	except Exception, e:
 		print e
-		os.system('pause')
