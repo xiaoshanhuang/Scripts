@@ -3,8 +3,8 @@
 #title           : freetunet.py
 #description     : config ip for free tunet access
 #author          : Xiaoshan Huang, xiaoshanhuang@gmail.com
-#date            : 2013-09-22 15:51
-#version         : 0.6
+#date            : 2013-10-12 10:02
+#version         : 0.7
 #usage           : python freetunet.py
 #notes           : 
 #python_version  : 2.7
@@ -13,7 +13,7 @@ ipPreFix = '166.111.153.'	# IP prefix for school of medicine
 arrSubnetMasks = '255.255.254.0'
 arrRouterAddr = '166.111.152.1'
 waitTime = 1
-connectTimeOut = 3
+connectTimeOut = 5
 tunet = "http://net.tsinghua.edu.cn/"
 baidu = "http://www.baidu.com/"
 
@@ -157,9 +157,9 @@ def freeIPSearchOSX(ipPreFix, ipSweepRange):
 if __name__=="__main__":
 	import platform
 	import os
-	ipRange = range(50,255)
-	availableIPRange = getIPSweepRange(ipPreFix)
-	# availableIPRange = range(1,255)
+	ipRange = range(30,255)
+	# availableIPRange = getIPSweepRange(ipPreFix)
+	availableIPRange = range(1,255)
 	ipSweepRange = [];
 	for ip in availableIPRange:
 		if ip in ipRange:
@@ -174,6 +174,8 @@ if __name__=="__main__":
 			freeIPSearchWmi(ipPreFix, ipSweepRange)
 		else:
 			print 'Linux?'
+	except (KeyboardInterrupt, SystemExit):
+		raise
 	except Exception, e:
 		print e
 		os.system('pause')
