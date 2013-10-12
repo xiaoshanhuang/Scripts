@@ -157,11 +157,7 @@ def freeIPSearchOSX(ipPreFix, ipSweepRange):
 if __name__=="__main__":
 	import platform
 	import os
-<<<<<<< HEAD
 	ipRange = range(30,255)
-=======
-	ipRange = range(50,255)
->>>>>>> e0e83c1919a7541adc123680c63dee1117b128b1
 	# availableIPRange = getIPSweepRange(ipPreFix)
 	availableIPRange = range(1,255)
 	ipSweepRange = [];
@@ -183,4 +179,3 @@ if __name__=="__main__":
 	except Exception, e:
 		print e
 		os.system('pause')
->>>>>>> 57125a564a3a3c9579a7c0be76eb1eddf5c99fd8
