@@ -54,6 +54,7 @@ sudo ifconfig gif0 tunnel $inet4 $router
 # set route
 sudo route delete -inet6 default 1>/dev/null 2>&1
 sudo route add -inet6 default $gateway 1>/dev/null
+# sudo route -n add -net $router $inet4 1>/dev/null
 
 # echo result
 inet4=`ifconfig gif0 | grep tunnel | awk '{print $3}'`
