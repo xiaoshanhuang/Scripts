@@ -201,9 +201,12 @@ def onExit():
 if __name__=="__main__":
 	import platform
 	import os
+	import sys
 	import commands
 	import time
-	ipRange = range(50,255)
+	if len(sys.argv)>0:
+		print 'Search IP Range: '+sys.argv[1]+'-'+sys.argv[2]
+	ipRange = range(int(sys.argv[1]),int(sys.argv[2]))
 	# availableIPRange = getIPSweepRange(ipPreFix)
 	availableIPRange = range(1,255)
 	ipSweepRange = [];
