@@ -1,0 +1,1 @@
+python D:\GitHub\Scripts\freetunet.py 40 255
