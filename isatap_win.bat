@@ -1,2 +1,2 @@
-netsh interface IPv6 ISATAP set router isatap.tsinghua.edu.cn
+netsh interface IPv6 isatap set router isatap.tsinghua.edu.cn
 pause>nul
