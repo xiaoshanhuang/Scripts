@@ -13,7 +13,12 @@ import urllib2
 import gzip
 from StringIO import StringIO
 import HTMLParser
-url = 'http://157.166.248.245/gameline/20131124/'
+import datetime
+
+today = datetime.date.today() - datetime.timedelta(days = 1)
+today = filter(str.isdigit, today.isoformat())
+print today
+url = 'http://157.166.248.245/gameline/' + today
 videoPrefix = 'http://nba.cdn.turner.com/nba/big/'
 videoSuffix = '_nba_1280x720.mp4'
 
@@ -23,7 +28,6 @@ class VideoAddrParser(HTMLParser.HTMLParser):
             for name,value in attrs:
                 if name == 'href' and 'recap.nba' in value:
                     print value.replace('/video/', videoPrefix).replace('/index.html', videoSuffix)
-
 req = urllib2.Request(url)
 response = urllib2.urlopen(req)
 the_page = response.read()
