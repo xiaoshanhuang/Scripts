@@ -26,11 +26,12 @@ class VideoAddrParser(HTMLParser.HTMLParser):
     def handle_starttag(self, tag, attrs):
         if tag == 'a':
             for name,value in attrs:
-                if name == 'href' and 'recap.nba' in value:
+                if name == 'href' and '/video/games/' in value:
                     print value.replace('/video/', videoPrefix).replace('/index.html', videoSuffix)
 req = urllib2.Request(url)
 response = urllib2.urlopen(req)
 the_page = response.read()
+# print the_page
 parser = VideoAddrParser()
 parser.feed(the_page)
 parser.close()
