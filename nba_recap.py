@@ -3,8 +3,8 @@
 #title           : nba_recap.py
 #description     : 
 #author          : Xiaoshan Huang, xiaoshanhuang@gmail.com
-#date            : 2013-11-25 22:11
-#version         : 0.1
+#date            : 2013-12-17 16:06
+#version         : 0.2
 #usage           : python nba_recap.py
 #notes           : get nba.com daily recap *.mp4 address
 #python_version  : 2.7
@@ -31,7 +31,6 @@ class VideoAddrParser(HTMLParser.HTMLParser):
 req = urllib2.Request(url)
 response = urllib2.urlopen(req)
 the_page = response.read()
-# print the_page
 parser = VideoAddrParser()
 parser.feed(the_page)
 parser.close()
