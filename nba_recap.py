@@ -20,7 +20,7 @@ today = filter(str.isdigit, today.isoformat())
 print today
 url = 'http://157.166.248.245/gameline/' + today
 videoPrefix = 'http://nba.cdn.turner.com/nba/big/'
-videoSuffix = '_nba_1280x720.mp4'
+videoSuffix = '_1280x720.mp4'
 
 class VideoAddrParser(HTMLParser.HTMLParser):
     def handle_starttag(self, tag, attrs):
