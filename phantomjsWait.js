@@ -17,6 +17,7 @@ page.open(address, function (status) {
 				// return document.getElementsByTagName('body')[0].outerHTML;
 				return document.documentElement.outerHTML
 			});
+			// page.render('temp.png');
 			console.log(html);
 			phantom.exit();
 		});
