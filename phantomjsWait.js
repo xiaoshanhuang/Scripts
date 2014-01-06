@@ -14,7 +14,8 @@ page.open(address, function (status) {
 			return msg === 'done';
 		}, function(){
 			var html = page.evaluate(function () {
-				return document.getElementsByTagName('body')[0].outerHTML;
+				// return document.getElementsByTagName('body')[0].outerHTML;
+				return document.documentElement.outerHTML
 			});
 			console.log(html);
 			phantom.exit();
