@@ -9,9 +9,9 @@
 #notes           : 
 #python_version  : 2.7
 #==============================================================================
-ipPreFix = '166.111.153.'	# IP prefix for school of medicine
-arrSubnetMasks = '255.255.254.0'
-arrRouterAddr = '166.111.152.1'
+ipPreFix = '166.111.154.'	# IP prefix for school of medicine
+arrSubnetMasks = '255.255.255.0'
+arrRouterAddr = '166.111.154.1'
 waitTime = 1
 connectTimeOut = 5
 tunet = "http://net.tsinghua.edu.cn/"
