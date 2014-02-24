@@ -16,11 +16,14 @@ $endif$
 % 中文字体段落设置
   \usepackage{fontspec}   % 允許設定字體
   \usepackage{xeCJK}    % 分開設置中英文字型
-  \setCJKmainfont{Hiragino Sans GB}   % 設定中文字型
-  % \setmainfont{Times New Roman}   % 設定英文字型
-  % \setromanfont{Times New Roman}  % 字型
-  \setmonofont{Menlo}
-  % \linespread{1.2}\selectfont   % 行距
+  \setCJKmainfont{SimSun}   % 設定中文字型
+  \setmainfont{Times New Roman}   % 設定英文字型
+  \setromanfont{Times New Roman}  % 字型
+  % \setCJKmainfont{Hiragino Sans GB}   % 設定中文字型
+  % \setmainfont{Helvetica}   % 設定英文字型
+  % \setromanfont{Helvetica}  % 字型
+  % \setmonofont{Menlo}
+  \linespread{1.5}\selectfont   % 行距
   \XeTeXlinebreaklocale "zh"  % 針對中文自動換行
   % \XeTeXlinebreakskip = 0pt plus 1pt % 字與字之間加入0pt至1pt的間距，確保左右對整齊
   % \parindent 2em    % 段落縮進
@@ -127,6 +130,7 @@ $endif$
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{6pt plus 2pt minus 1pt}
 \setlength{\emergencystretch}{3em}  % prevent overfull lines
+
 $if(numbersections)$
 \setcounter{secnumdepth}{5}
 $else$
