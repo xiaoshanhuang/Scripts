@@ -22,6 +22,7 @@ $endif$
   % \setCJKmainfont{Hiragino Sans GB}   % 設定中文字型
   % \setmainfont{Helvetica}   % 設定英文字型
   % \setromanfont{Helvetica}  % 字型
+  % \setsansfont{Helvetica}
   % \setmonofont{Menlo}
   \linespread{1.5}\selectfont   % 行距
   \XeTeXlinebreaklocale "zh"  % 針對中文自動換行
