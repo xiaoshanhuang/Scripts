@@ -11,7 +11,7 @@
 #==============================================================================
 ipPreFix = '166.111.154.'	# IP prefix for school of medicine
 arrSubnetMasks = '255.255.255.0'
-arrRouterAddr = '166.111.154.1'
+arrRouterAddr = '166.111.153.1'
 waitTime = 1
 connectTimeOut = 5
 tunet = "http://net.tsinghua.edu.cn/"
