@@ -4,7 +4,7 @@ $if(theme)$
 \usetheme{$theme$}
 $endif$
 $if(colortheme)$
-\usecolortheme{$colortheme$}
+\usecolortheme[dark]{$colortheme$}
 $endif$
 $if(fonttheme)$
 \usefonttheme{$fonttheme$}
