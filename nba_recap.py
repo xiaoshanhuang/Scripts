@@ -18,7 +18,7 @@ import datetime
 today = datetime.date.today() - datetime.timedelta(days = 1)
 today = filter(str.isdigit, today.isoformat())
 print today
-url = 'http://157.166.248.245/gameline/' + today
+url = 'http://www.nba.com/gameline/' + today
 videoPrefix = 'http://nba.cdn.turner.com/nba/big/'
 videoSuffix = '_1280x720.mp4'
 
@@ -27,6 +27,8 @@ class VideoAddrParser(HTMLParser.HTMLParser):
         if tag == 'a':
             for name,value in attrs:
                 if name == 'href' and '/video/games/' in value:
+                # for playoffs
+                # if name == 'href' and '/video/channels/playoffs/' in value:
                     print value.replace('/video/', videoPrefix).replace('/index.html', videoSuffix)
 req = urllib2.Request(url)
 response = urllib2.urlopen(req)
